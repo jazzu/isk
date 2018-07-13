@@ -111,11 +111,7 @@ class SlidesController < ApplicationController
       end
     end # Transaction
 
-    if @slide.is_a? HttpSlide
-      @slide.fetch_later
-    else
-      @slide.generate_images_later
-    end
+    @slide.generate_images_later
 
     respond_to do |format|
       format.html { redirect_to slide_path(@slide) }
@@ -148,9 +144,7 @@ class SlidesController < ApplicationController
       if @slide.update_attributes(slide_params)
         # Generate images as needed
         # FIXME: This needs to be more universal..
-        @slide.generate_images_later if !@slide.is_a?(HttpSlide) && !@slide.ready
-        # Fetch the http slide image if needed
-        @slide.fetch_later if @slide.is_a?(HttpSlide) && @slide.needs_fetch?
+        @slide.generate_images_later unless @slide.ready
 
         respond_to do |format|
           format.html do
@@ -299,7 +293,7 @@ class SlidesController < ApplicationController
     @slide.svg_data = params[:svg]
     @slide.save!
     @slide.generate_images_later
-    render nothing: true
+    render body: nil
   end
 
   # Convert a slide to InkscapeSlide
@@ -331,10 +325,12 @@ class SlidesController < ApplicationController
   # Send the slide preview image, we set the cache headers
   # to avoid unecessary reloading
   def preview
+    slide = Slide.find(params[:id])
     redirect_to slide_image_path(params[:id], size: :preview)
   end
 
   def thumb
+    slide = Slide.find(params[:id])
     redirect_to slide_image_path(params[:id], size: :thumb)
   end
 
@@ -342,6 +338,7 @@ class SlidesController < ApplicationController
   # We will always send the last rendered image if it exists
   # If not we will issue 404 status
   def full
+    slide = Slide.find(params[:id])
     redirect_to slide_image_path(params[:id])
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class SlidesControllerTest < ActionController::TestCase
@@ -197,5 +199,15 @@ class SlidesControllerTest < ActionController::TestCase
     }
 
     assert_acl_coverage(:slides, @forbidden_actions, allowed)
+  end
+
+  test "slide list without permissions" do
+    get :index, nil, user_id: users(:no_roles)
+    assert_response :success
+  end
+
+  test "slide info without permissions" do
+    get :show, { id: slides(:simple) }, user_id: users(:no_roles)
+    assert_response :success
   end
 end

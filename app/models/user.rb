@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ISK - A web controllable slideshow system
 #
 # Author::    Vesa-Pekka Palmu
@@ -19,9 +21,6 @@ class User < ActiveRecord::Base
   has_many :displays, -> { order "displays.name" },           through: :permissions, source: :target, source_type: "Display"
   has_many :auth_tokens
 
-  # Cache sweeper
-  include CacheSweeper
-
   def admin?
     User::AdminUsers.include?(username)
   end
@@ -37,15 +36,11 @@ class User < ActiveRecord::Base
   end
 
   def roles_text
-    text = ""
-    roles.each do |r|
-      text << r.role << ", "
-    end
-    return text.chomp(", ")
+    roles.collect(&:role).join(", ")
   end
 
   def name
-    return self[:lastname] << ", " << self[:firstname]
+    return "#{lastname}, #{firstname}"
   end
 
   def password=(str)

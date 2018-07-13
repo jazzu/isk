@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ISK - A web controllable slideshow system
 #
 # Author::    Vesa-Pekka Palmu
@@ -21,8 +23,6 @@ class Group < ActiveRecord::Base
 
   # Send websocket messages on create and update
   include WebsocketMessages
-  # Cache sweeper
-  include CacheSweeper
 
   def to_hash
     hash = Hash.new

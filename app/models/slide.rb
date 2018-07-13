@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ISK - A web controllable slideshow system
 #
 # Author::    Vesa-Pekka Palmu
@@ -58,11 +60,9 @@ class Slide < ActiveRecord::Base
   include HasTickets
   # ACL system
   include ModelAuthorization
-  # Cache sweeper
-  include CacheSweeper
 
   # Constants
-  TypeString = "image".freeze
+  TypeString = "image"
   FilePath = Rails.root.join("data", "slides").freeze
   UsePresentationDelay = -1 # Set duration to this to use presentation setting
 
@@ -171,7 +171,7 @@ class Slide < ActiveRecord::Base
     end
     hash[:effect_id] = ef
     hash[:group] = presentation_group_id if has_attribute? :presentation_group_id
-    hash[:media_url] = Rails.application.routes.url_helpers.slide_image_path(self, size: :full)
+    hash[:media_url] = Rails.application.routes.url_helpers.slide_image_path(self)
     hash[:base_url] = Rails.application.routes.url_helpers.slide_path(self)
     return hash
   end

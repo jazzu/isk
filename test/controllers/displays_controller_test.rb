@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 require "redis_test_helpers"
 require "test_tubesock"
@@ -208,6 +210,14 @@ class DisplaysControllerTest < ActionController::TestCase
     msg = IskMessage.new("command", "ping", asd: "fooo")
     tube :websocket, { id: d.id }, nil, msg.encode, true
     assert_one_sent_message "error", "forbidden"
+  end
+
+  test "clear queue" do
+    d = displays(:with_overrides)
+    post :clear_queue, { id: d.id }, @adminsession
+    assert_response :redirect
+    d.reload
+    assert d.override_queues.empty?
   end
 
   def assert_messages(count, types)

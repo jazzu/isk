@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ISK - A web controllable slideshow system
 #
 # Author::		Vesa-Pekka Palmu
@@ -31,13 +33,8 @@ module ApplicationHelper
 
   # Inactive toggle button with "led"
   def inactive_toggle(name, status)
-    if status
-      html = "<a class='button inactive led green'>"
-    else
-      html = "<a class='button inactive led off'>"
-    end
-    html << name << "</a>"
-    return html.html_safe
+    led = (status ? "green" : "off")
+    "<a class='btn btn-primary disabled button inactive led #{led}'>#{name}</a>".html_safe
   end
 
   # Active toggle button with a "led"

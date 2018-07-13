@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ISK - A web controllable slideshow system
 #
 # Author::    Vesa-Pekka Palmu
@@ -23,8 +25,6 @@ class MasterGroup < ActiveRecord::Base
   include ZipSlides
   # Ticket system
   include HasTickets
-  # Cache sweeper
-  include CacheSweeper
 
   scope :defined_groups, (-> { where(internal: false).order("name") })
 

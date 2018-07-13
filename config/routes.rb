@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ISK - A web controllable slideshow system
 #
 # Author::    Vesa-Pekka Palmu
@@ -77,6 +79,7 @@ Isk::Application.routes.draw do
       get "slide_queue"
       post "sort_queue"
       post "remove_override"
+      post "clear_queue"
       put "update_override"
       get "dpy_control"
       get "websocket"

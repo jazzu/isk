@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ISK - A web controllable slideshow system
 #
 # Author::    Vesa-Pekka Palmu
@@ -5,7 +7,7 @@
 # License::   Licensed under GPL v3, see LICENSE.md
 
 class SimpleSlide < SvgSlide
-  TypeString = "simple".freeze
+  TypeString = "simple"
 
   # Slidedata functionality
   DefaultSlidedata = {
@@ -19,9 +21,9 @@ class SimpleSlide < SvgSlide
   include HasSlidedata
 
   BaseTemplate = Rails.root.join("data", "templates", "simple.svg").freeze
-  HeadingSelector = "text#header".freeze
-  BodySelector = "text#slide_content".freeze
-  BackgroundSelector = "image#background_picture".freeze
+  HeadingSelector = "text#header"
+  BodySelector = "text#slide_content"
+  BackgroundSelector = "image#background_picture"
   Colors = ["Gold", "Red", "Orange", "Yellow", "PaleGreen", "Aqua", "LightPink"].freeze
 
   validate :check_color
@@ -202,7 +204,7 @@ private
     def set_text(element, text, text_x, color = nil, size = nil, align = nil)
       # Set default attributes
       element["x"] = text_x
-
+      element["sodipodi:linespacing"] = "100%"
       if size
         element["font-size"] = size
       else
@@ -213,9 +215,10 @@ private
 
       text.each_line do |l|
         row = Nokogiri::XML::Node.new "tspan", element
-        row["x"] = text_x
         row["sodipodi:role"] = "line"
         row["xml:space"] = "preserve"
+        row["font-size"] = size
+        row["x"] = text_x
 
         # Set the line spacing. First line has no spacing, others have 1em spacing.
         if first_line

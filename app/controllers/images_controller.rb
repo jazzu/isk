@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 class ImagesController < ApplicationController
   # Nested controller for slide images
 
   # Send a given sized slide image
   def show
     @slide = Slide.find(params[:slide_id])
-    return unless stale?(last_modified: @slide.images_updated_at.utc, etag: @slide)
     filename = ""
     case params[:size]
     when "preview"
@@ -18,15 +19,17 @@ class ImagesController < ApplicationController
     end
     respond_to do |format|
       format.html do
+        # Conditional get
+        render body: nil, status: 404 if @slide.images_updated_at.nil?
+        return unless stale?(last_modified: @slide.images_updated_at.utc, etag: @slide)
+
         # Set content headers to allow CORS
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Request-Method"] = "GET"
         if @slide.ready
           send_file filename, disposition: "inline"
         else
-          render body: nil, status: 404 && return if params[:size] == "full" || params[:size] == "transparent"
-          send_file(Rails.root.join("data", "no_image.jpg"),
-                    disposition: "inline")
+          render body: nil, status: 404
         end
       end
       format.js { render :show }

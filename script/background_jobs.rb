@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # ISK - A web controllable slideshow system
 #
@@ -42,13 +43,17 @@ Daemons.run_proc("background_jobs", options) do
     say "Fetching http-slides.."
     begin
       realtime = Benchmark.realtime do
-        @slides = Event.current.slides.where(type: "HttpSlide").all.each(&:fetch!)
+        @slides = Event.current.slides.where(type: "HttpSlide").all.each do |s|
+          begin
+            s.generate_images
+          rescue StandardError => e
+            say "Error fetching http-slide: #{s.name}"
+            puts e.message
+            puts e.backtrace.inspect
+          end
+        end
       end
       say " -> Fetched #{@slides.size} slides in %.2f seconds (%.2f sec. per slide)" % [realtime, realtime / @slides.size]
-    rescue StandardError => e
-      say "Error fetching http-slides"
-      puts e.message
-      puts e.backtrace.inspect
     end
     @slides = nil
 

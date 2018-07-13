@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ISK - A web controllable slideshow system
 #
 # Author::    Vesa-Pekka Palmu
@@ -5,7 +7,7 @@
 # License::   Licensed under GPL v3, see LICENSE.md
 
 class SvgSlide < Slide
-  TypeString = "svg-edit".freeze
+  TypeString = "svg-edit"
   @_svg_data = nil
 
   before_create do |slide|
@@ -22,7 +24,7 @@ class SvgSlide < Slide
     tmp_svg.close
     tmp_file = Tempfile.new
     output = `#{inkscape_command_line(tmp_svg.path, tmp_file)}`
-    raise Slide::ImageError, "Error converting the slide svg into PNG\nInkscape output:\n#{output}" unless $CHILD_STATUS.to_i.zero?
+    raise Slide::ImageError, "Error converting the slide svg into PNG\nInkscape output:\n#{output}" unless $?.to_i.zero?
 
     FileUtils.mv tmp_file.path, transparent_filename
     # Tmpfile has 700 mode, we need to give other read permissions (mainly the web server)
@@ -33,7 +35,7 @@ class SvgSlide < Slide
     # Generate the normal unaltered full size image
     tmp_file = Tempfile.new("isk-image")
     output = `#{inkscape_command_line(svg_filename, tmp_file)}`
-    return compare_new_image(tmp_file) if $CHILD_STATUS.to_i.zero?
+    return compare_new_image(tmp_file) if $?.to_i.zero?
     raise Slide::ImageError, "Error converting the slide svg into PNG\nInkscape output:\n#{output}"
   end
 
@@ -47,14 +49,7 @@ private
   def inkscape_command_line(svg_file, tmp_file)
     size = picture_sizes[:full]
     # Chance to proper directory
-    command = "cd #{Slide::FilePath} && inkscape"
-    # Export size
-    command << " -w #{size.first} -h #{size.last}"
-    # Export to file
-    command << " -e #{tmp_file.path} #{svg_file}"
-    # Supress std-out reporting
-    command << " 2>&1"
-
+    command = "cd #{Slide::FilePath} && inkscape -w #{size.first} -h #{size.last} -e #{tmp_file.path} #{svg_file} 2>&1"
     return command
   end
 end

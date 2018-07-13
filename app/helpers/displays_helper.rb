@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ISK - A web controllable slideshow system
 #
 # Author::		Vesa-Pekka Palmu
@@ -9,6 +11,13 @@ module DisplaysHelper
   def late_display_warning(d)
     link_text = "#{d.name} (#{d.ip}) is more than #{Display::TIMEOUT} minutes late!"
     link_to link_text, display_path(d), class: "alert-link"
+  end
+
+  def display_clear_queue_button(d)
+    link_to "Clear override queue", clear_queue_display_path(d),
+            class: "btn btn-danger", title: "Clear all slides from the override queue",
+            data: { confirm: "Clear all slides in the override queue?" },
+            method: :post
   end
 
   # Link to displays#destroy if user has sufficient access
@@ -77,7 +86,9 @@ module DisplaysHelper
   # Render the last_contact_at timestamp and the diff to current time
   def display_last_contact(d)
     return "UNKNOWN" unless d.last_contact_at
-    delta = Time.diff(Time.now, d.last_contact_at, "%h:%m:%s")[:diff]
+    time_diff = Time.now - d.last_contact_at
+    return "> 24h" if time_diff > 24.hours
+    delta = Time.at(time_diff.to_i.abs).utc.strftime "%H:%M:%S"
     return "#{l d.last_contact_at, format: :short} (#{delta} ago)"
   end
 end
